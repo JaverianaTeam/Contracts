@@ -1,0 +1,228 @@
+openapi: 3.0.1
+info:
+  title: Service Order Manager
+  description: ""
+  termsOfService: ""
+  contact:
+    email: apiteam@swagger.io
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+servers:
+- url: https://petstore.swagger.io/v2
+- url: http://petstore.swagger.io/v2
+tags:
+- name: Order Manager
+  description: order manager
+- name: user
+  description: Operations about user
+paths:
+  /order/manager/register:
+    put:
+      tags:
+      - order
+      summary: 'Register a sales order '
+      operationId: registerOrder
+      requestBody:
+        description: Order object with all items that needs to be added to the database
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Order'
+        required: true
+      responses:
+        200:
+          description: Success register order
+          content: {}
+        400:
+          description: Invalid ID supplied
+          content: {}
+        401:
+          description: Unauthorized
+          content: {}
+      security:
+      - touresbalon_auth:
+        - write:order
+      x-codegen-request-body-name: body
+  /order/manager/status:
+    put:
+      tags:
+      - order status
+      summary: Update a sales order status
+      operationId: updateOrder
+      requestBody:
+        description: Status object with the order id to be updated
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StatusUpdate'
+        required: true
+      responses:
+        200:
+          description: Success register order
+          content: {}
+        400:
+          description: Invalid ID supplied
+          content: {}
+        401:
+          description: Unauthorized
+          content: {}
+      security:
+      - touresbalon_auth:
+        - write:order
+      x-codegen-request-body-name: body
+components:
+  schemas:
+    Order:
+      type: object
+      properties:
+        custId:
+          type: string
+          example: CC159753
+        ordId:
+          type: string
+          example: OVTB-001
+        orderDate:
+          type: string
+          format: date-time
+        price:
+          type: number
+          format: double
+          example: 1.852E+7
+        status:
+          $ref: '#/components/schemas/Status'
+        commnets:
+          type: string
+          example: Orden de compra para partidos de eliminatorias en Barranquilla
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Producto'
+    StatusUpdate:
+      type: object
+      properties:
+        custId:
+          type: string
+          example: CC159753
+        ordId:
+          type: string
+          example: OVTB-001
+        status:
+          $ref: '#/components/schemas/Status'
+    Status:
+      type: object
+      properties:
+        status:
+          type: string
+          description: Order Status
+          enum:
+          - En Validación
+          - En Reservación
+          - Cerrada
+          - Rechazada
+          - Cancelada
+    Producto:
+      type: object
+      properties:
+        prodId:
+          type: integer
+          example: 25641
+        productName:
+          type: string
+          example: Paquete eliminatorias local
+        partNum:
+          type: string
+          example: ELTB-056
+        price:
+          type: number
+          format: double
+          example: 1.852E+7
+        quantity:
+          type: integer
+          example: 1
+        espectaculo:
+          type: string
+          example: Fútbol - Selección Colombia
+        fechaEspectaculo:
+          type: string
+          format: date-time
+        ciudadEspectaculo:
+          type: string
+          example: Barranquilla
+        fechaLlegada:
+          type: string
+          example: 2020-09-12
+        fechaSalida:
+          type: string
+          example: 2020-09-14
+        tipoTransporte:
+          $ref: '#/components/schemas/Transporte'
+        tipoEspectaculo:
+          $ref: '#/components/schemas/Espectaculo'
+        tipoHospedaje:
+          $ref: '#/components/schemas/Hospedaje'
+    Transporte:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 123569
+        nombreTipo:
+          type: string
+          example: American Airlines
+        precio:
+          type: number
+          format: double
+          example: 3694562.0
+    Espectaculo:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 956845
+        nombreTipo:
+          type: string
+          example: Fútbol FCF
+        precio:
+          type: number
+          format: double
+          example: 2875900.0
+    Hospedaje:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 421659
+        nombreTipo:
+          type: string
+          example: Dann Carlton
+        precio:
+          type: number
+          format: double
+          example: 5946100.0
+    ApiResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+        type:
+          type: string
+        message:
+          type: string
+  securitySchemes:
+    touresbalon_auth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: http://touresbalon.swagger.io/oauth/dialog
+          scopes:
+            write:order: register and modify order in the system
+    api_key:
+      type: apiKey
+      name: api_key
+      in: header

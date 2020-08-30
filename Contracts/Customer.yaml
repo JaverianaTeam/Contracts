@@ -1,0 +1,177 @@
+openapi: 3.0.3
+info:
+  title: Servicio de Gestión de clientes
+  description: Servicio que permite registrar, actualizar, inactivar clientes
+  version: 1.0.0
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licences/LICENSE-2.0.html"
+  contact:
+    name: "Byron Martínez, Edgar Javier Rivera, Rafael Ocampo, Fabian Burgos, Harry Sánchez"
+    email: "jrafael.ocampo@javeriana.edu.co"
+servers:
+  - url: 'https://localhost:8080/Cliente'
+paths:
+  /api/customer:
+    get:
+      summary: Operación para la consulta de datos del cliente.
+      description: Permite consultar los datos de un cliente, basado en el id cliente.
+      parameters:
+        - in: query
+          description: Identificador del cliente
+          name: customerId
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Consulta realizada exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerResponse'
+        404:
+          description: La factura o convenio que se intenta consultar no existe.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    post:
+      summary: Operación que permite registrar un nuevo cliente en el sistema
+      description: Recibe los datos del cliente
+      requestBody:
+        description: Datos para el pago.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerRequest'
+      responses:
+        '200':
+          description: Operación exitosa, ver mensaje con el resultado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerResponse'
+        '400':
+          description: Bad request, hay algún error en los parámetros especificados
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Cliente no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      summary: Servicio que permite actualizar o modificar los datos de un cliente.
+      description: Recibe la información del cliente que se desea actualizar.
+      requestBody:
+        description: Datos del cliente que se desea actualizar
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerRequest'
+      responses:
+        '200':
+          description: Operación exitosa, ver mensaje con el resultado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerResponse'
+        '400':
+          description: Bad request, hay algún error en los parámetros especificados
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Cliente no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      required:
+        - code
+        - message
+
+    Address:
+      type: object
+      properties:
+        street:
+          description: Número de la calle o avenida
+          type: string
+        state:
+          description: Estado, provincia o departamento de la dirección
+          type: string
+        city:
+          description: Ciudad de la dirección
+          type: string
+        zip:
+          description: Zona postal
+          type: string
+        country:
+          description: País de la dirección
+          type: string
+
+
+    CustomerRequest:
+      type: object
+      properties:
+        firstName:
+          description: Nombre del cliente
+          type: string
+        lastName:
+          description: Apellidos del cliente
+          type: string
+        phone:
+          description: Número telefónico del cliente
+          type: string
+        email:
+          description: Correo electrónico del cliente
+          type: string
+        password:
+          description: Clave de acceso del cliente
+          type: string
+        creditCardType:
+          description: Franquicia de tarjeta de crédito del cliente
+          type: string
+          enum:
+            - "VISA"
+            - "MASTER CARD"
+            - "AMERICAN EXPRESS"
+            - "DINERS CLUB"
+            - "CREDENCIAL"
+        creditCardNumber:
+          description: Número de la tarjeta de crédito del cliente
+          type: string
+        status:
+          description: Estado del cliente
+          type: string
+        addresses:
+          description: Lista de direcciones asociadas al cliente
+          type: array
+          items:
+            $ref: '#/components/schemas/Address'
+
+    CustomerResponse:
+      type: object
+      properties:
+        customerId:
+          description: Identificador del cliente
+          type: string
+      allOf:
+        - $ref: '#/components/schemas/CustomerRequest'
