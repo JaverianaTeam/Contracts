@@ -115,3 +115,6 @@ components:
         errorCode:
           type: integer
           example: 0
+        notificationId:
+          type: string
+          format: uuid
