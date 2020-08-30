@@ -25,7 +25,7 @@ paths:
     put:
       tags:
       - order
-      summary: 'Register a sales order '
+      summary: Register a sales order
       operationId: registerOrder
       requestBody:
         description: Order object with all items that needs to be added to the database
@@ -37,10 +37,10 @@ paths:
       responses:
         200:
           description: Success register order
-          content: {}
-        400:
-          description: Invalid ID supplied
-          content: {}
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
         401:
           description: Unauthorized
           content: {}
@@ -48,6 +48,32 @@ paths:
       - touresbalon_auth:
         - write:order
       x-codegen-request-body-name: body
+  /order/manager/{orderId}:
+    get:
+      tags:
+      - get an order
+      summary: Get a order by orderId
+      operationId: queryOrderById
+      parameters:
+      - name: orderId
+        in: path
+        description: id of order to return
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FullOrder'
+        404:
+          description: Order not found
+          content: {}
+      security:
+      - touresbalon_auth:
+        - read:order
   /order/manager/status:
     put:
       tags:
@@ -64,16 +90,44 @@ paths:
       responses:
         200:
           description: Success register order
-          content: {}
-        400:
-          description: Invalid ID supplied
-          content: {}
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
         401:
           description: Unauthorized
           content: {}
       security:
       - touresbalon_auth:
         - write:order
+      x-codegen-request-body-name: body
+  /order/manager/bookings:
+    put:
+      tags:
+      - bookings
+      summary: Update booking of the orders
+      operationId: confirmBookingByOrder
+      requestBody:
+        description: Pet object that needs to be added to the store
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderBooking'
+        required: true
+      responses:
+        200:
+          description: Success update order
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        405:
+          description: Invalid input
+          content: {}
+      security:
+      - touresbalon_auth:
+        - write:order
+        - read:order
       x-codegen-request-body-name: body
 components:
   schemas:
@@ -83,19 +137,11 @@ components:
         custId:
           type: string
           example: CC159753
-        ordId:
-          type: string
-          example: OVTB-001
-        orderDate:
-          type: string
-          format: date-time
-        price:
+        totalPrice:
           type: number
           format: double
           example: 1.852E+7
-        status:
-          $ref: '#/components/schemas/Status'
-        commnets:
+        comments:
           type: string
           example: Orden de compra para partidos de eliminatorias en Barranquilla
         items:
@@ -128,82 +174,127 @@ components:
     Producto:
       type: object
       properties:
-        prodId:
-          type: integer
-          example: 25641
-        productName:
-          type: string
-          example: Paquete eliminatorias local
-        partNum:
-          type: string
-          example: ELTB-056
-        price:
-          type: number
-          format: double
-          example: 1.852E+7
         quantity:
           type: integer
           example: 1
-        espectaculo:
-          type: string
-          example: Fútbol - Selección Colombia
-        fechaEspectaculo:
-          type: string
-          format: date-time
-        ciudadEspectaculo:
-          type: string
-          example: Barranquilla
-        fechaLlegada:
-          type: string
-          example: 2020-09-12
-        fechaSalida:
-          type: string
-          example: 2020-09-14
-        tipoTransporte:
+        transportType:
           $ref: '#/components/schemas/Transporte'
-        tipoEspectaculo:
+        eventType:
           $ref: '#/components/schemas/Espectaculo'
-        tipoHospedaje:
+        hostType:
           $ref: '#/components/schemas/Hospedaje'
     Transporte:
       type: object
       properties:
-        id:
+        provider:
+          type: string
+          example: AA00126
+        departureDate:
+          type: string
+          example: 2020-09-12
+        arriveDate:
+          type: string
+          example: 2020-09-14
+        flyId:
           type: integer
           example: 123569
-        nombreTipo:
-          type: string
-          example: American Airlines
-        precio:
+        price:
           type: number
           format: double
           example: 3694562.0
     Espectaculo:
       type: object
       properties:
-        id:
+        eventId:
           type: integer
           example: 956845
-        nombreTipo:
-          type: string
-          example: Fútbol FCF
-        precio:
+        price:
           type: number
           format: double
           example: 2875900.0
     Hospedaje:
       type: object
       properties:
-        id:
-          type: integer
-          example: 421659
-        nombreTipo:
+        hotel:
           type: string
           example: Dann Carlton
-        precio:
+        country:
+          type: string
+          example: Colombia
+        city:
+          type: string
+          example: Barranquilla
+        address:
+          type: string
+          example: Calle 123
+        rooms:
+          type: array
+          items:
+            $ref: '#/components/schemas/Room'
+        checkInDate:
+          type: string
+          example: 2020-09-12
+        checkOutDate:
+          type: string
+          example: 2020-09-14
+        price:
           type: number
           format: double
           example: 5946100.0
+    Room:
+      type: object
+      properties:
+        occupation:
+          type: string
+          example: double
+    OrderBooking:
+      type: object
+      properties:
+        custId:
+          type: string
+          example: CC159753
+        orderId:
+          type: string
+          example: OVTB-001
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Booking'
+    Booking:
+      type: object
+      properties:
+        hotel:
+          type: string
+          example: DC-15648CR
+        transport:
+          type: string
+          example: WD7845F
+        event:
+          type: string
+          example: "152369"
+    FullOrder:
+      type: object
+      properties:
+        custId:
+          type: string
+          example: CC159753
+        orderId:
+          type: string
+          example: OVTB-001
+        orderDate:
+          type: string
+          example: 2020-08-12
+        totalPrice:
+          type: number
+          format: double
+          example: 1.852E+7
+        comments:
+          type: string
+          example: Orden de compra para partidos de eliminatorias en Barranquilla
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Producto'
     ApiResponse:
       type: object
       properties:
@@ -214,6 +305,8 @@ components:
           type: string
         message:
           type: string
+        orderId:
+          type: string
   securitySchemes:
     touresbalon_auth:
       type: oauth2
@@ -222,6 +315,7 @@ components:
           authorizationUrl: http://touresbalon.swagger.io/oauth/dialog
           scopes:
             write:order: register and modify order in the system
+            read:order: Get the order
     api_key:
       type: apiKey
       name: api_key
