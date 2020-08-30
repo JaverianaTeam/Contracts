@@ -1,0 +1,74 @@
+openapi: 3.0.0
+info:
+  version: '1.0'
+  title: Notification Connector
+  description: Notification Enrichment Component
+paths:
+  /api/v1/enrichment/notification:
+    description: "Enrichment process for BPMS"
+    get:
+      description: "Enrichment data for Notification Manager"
+      responses:
+        200:
+          description: "Order details"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/orderInfo'
+      parameters:
+        - name: orderId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+components:
+  schemas:
+    orderInfo:
+      type: object
+      properties:
+        order:
+          $ref: '#/components/schemas/orderDetails'
+        customer:
+          $ref: '#/components/schemas/client'
+    orderDetails:
+      type: object
+      properties:
+        orderId:
+          type: string
+          format: uuid
+        orderStatus:
+          type: string
+          description: State of the order
+          enum:
+            - Processing
+            - SuspectedFraud
+            - PendingPayment
+            - PaymentReview
+            - Pendingpending
+            - OnHold
+            - Open
+            - Complete
+            - Closed
+            - Canceled
+          example: Processing
+
+        orderDate:
+          type: string
+          format: date
+        orderLastUpdate:
+          type: string
+          format: date
+    client:
+      type: object
+      properties:
+        customerId:
+          type: integer
+          example: 1012458870
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+          format: email
