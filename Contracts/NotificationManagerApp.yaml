@@ -1,0 +1,120 @@
+openapi: 3.0.0
+info:
+  version: '0.5'
+  title: Notification Manager APP
+  description: Contract for the Notification Manager Service
+paths:
+  /api/v1/notification:
+    post:
+      description: "Sending a new notification"
+      responses:
+        200:
+          description: "Notification processed successfully"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/notificationResponse'
+        500:
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/notificationResponse'
+        400:
+          description: "Bad Request Error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/notificationResponse'
+      requestBody:
+        description: "Request body to send a new notification"
+        content:
+          applications/json:
+            schema:
+              $ref: '#/components/schemas/notificationRequest'
+
+  /api/v1/notification/{notificationId}:
+    get:
+      parameters:
+        - name: notificationId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: "Notification to be returned"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/notificationRequest'
+components:
+  schemas:
+    notificationRequest:
+      type: object
+      properties:
+        order:
+          $ref: '#/components/schemas/order'
+        customer:
+          $ref: '#/components/schemas/client'
+        emailContent:
+          $ref: '#/components/schemas/emailMessage'
+        priority:
+          type: integer
+          example: 1
+    order:
+      type: object
+      properties:
+        orderId:
+          type: string
+          format: uuid
+        orderStatus:
+          type: string
+          description: State of the order
+          enum:
+            - Processing
+            - SuspectedFraud
+            - PendingPayment
+            - PaymentReview
+            - Pendingpending
+            - OnHold
+            - Open
+            - Complete
+            - Closed
+            - Canceled
+          example: Processing
+
+        orderDate:
+          type: string
+          format: date
+        orderLastUpdate:
+          type: string
+          format: date
+    client:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+          format: email
+    emailMessage:
+      properties:
+        message:
+          type: string
+        emailTemplate:
+          type: integer
+          example: 3
+    notificationResponse:
+      properties:
+        message:
+          type: string
+        errorCode:
+          type: integer
+          example: 0
+        notificationId:
+          type: string
+          format: uuid
