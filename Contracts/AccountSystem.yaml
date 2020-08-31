@@ -1,0 +1,73 @@
+openapi: 3.0.0
+info:
+  title: Servicio de Gestion Contabilidad toures Balon
+  description: Servicio para regristor de contabilidad toures balon
+  version: 1.0.0
+servers:
+  - url: 'https'
+paths:
+  /api/AccountSys:
+    post:
+      summary: Operación que permite registrar la contabilidad de una orden
+      description: Recibe los datos de la orden
+      requestBody:
+        description: Datos para la contabilidad.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountRequest'
+      responses:
+        '200':
+          description: Operación exitosa, ver mensaje con el resultado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountResponse'
+        '400':
+          description: Bad request, hay algún error en los parámetros especificados
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Orden no encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      required:
+        - code
+        - message
+    AccountRequest:
+      type: object
+      properties:
+        orderId:
+          type: string
+          example: CC79800600
+        totalPrice:
+          type: number
+          format: double
+          example: 1.852E+7
+        comments:
+          type: string
+          example: Orden de compra para partidos de eliminatorias en Barranquilla
+    AccountResponse:
+      type: object
+      properties:
+        orderId:
+          description: Contabilidad Realizada
+          type: string
+      allOf:
+        - $ref: '#/components/schemas/AccountRequest'
+
+
