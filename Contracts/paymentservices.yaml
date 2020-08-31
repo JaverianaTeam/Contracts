@@ -1,0 +1,134 @@
+openapi: 3.0.3
+info:
+  title: Servicio de Pagos TC
+  description: Contrato de servicio para el pago de toures a traves de TC de la arquitectura
+  version: 1.0.0
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licences/LICENSE-2.0.html"
+  contact:
+    name: "AES Ltda"
+    email: "aessupport@aes.com.co"
+servers:
+  - url: 'https://localhost:8080/Cliente'
+paths:
+  /api/validatetc:
+    post:
+      summary: Operacion para validar TC de usuario de Touresbalon
+      description: Recibe datos del titular de la TC
+      requestBody:
+        description: Datos para validar TC.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/validateTCRequest'
+      responses:
+        '200':
+          description: Operación exitosa, ver mensaje con el resultado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/validateTCResponse'
+        '400':
+          description: Bad request, hay algún error en los parámetros especificados
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  
+  /api/chargetc:     
+     post:
+      summary: Operacion para realizar cargo TC de usuario de Touresbalon
+      description: Recibe datos del titular de la TC
+      requestBody:
+        description: Datos para hacer cargo a TC de usuario de TouresBalon
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/chargeTCRequest'
+      responses:
+        '200':
+          description: Operación exitosa, ver mensaje con el resultado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/chargeTCResponse'
+        '400':
+          description: Bad request, hay algún error en los parámetros especificados
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      required:
+        - code
+        - message
+
+
+    validateTCRequest:
+      type: object
+      properties:
+        names:
+          description: Nombres y apellidos del cliente
+          example: Fabian Andres Burgos Rojas
+          type: string
+        creditCardType:
+          description: Franquicia de tarjeta de crédito del usuario
+          type: string
+          enum:
+            - "VISA"
+            - "MASTER CARD"
+            - "AMERICAN EXPRESS"
+        creditCardNumber:
+          description: Número de la tarjeta de crédito del cliente
+          type: string
+          example: 5432432178902132
+          
+          
+    chargeTCRequest:
+      type: object
+      properties:
+        names:
+          description: Nombres y apellidos del cliente
+          example: Fabian Andres Burgos Rojas
+          type: string
+        creditCardType:
+          description: Franquicia de tarjeta de crédito del usuario
+          type: string
+          enum:
+            - "VISA"
+            - "MASTER CARD"
+            - "AMERICAN EXPRESS"
+        creditCardNumber:
+          description: Número de la tarjeta de crédito del cliente
+          type: string
+          example: 5432432178902132
+        totalmount:
+          description: Monto total a ser cargado a la tc de usuario de Touresbalon.
+          type: number
+          example: 212131,2121
+        
+    chargeTCResponse:
+      type: object
+      properties:
+        approvedchargetc:
+          description: Cargue valido o no a la TC del usuario de Touresbalon.
+          type: boolean      
+          
+    validateTCResponse:
+      type: object
+      properties:
+        tcok:
+          description: TC valida o no valida
+          type: boolean
