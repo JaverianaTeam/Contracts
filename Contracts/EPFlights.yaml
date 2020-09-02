@@ -1,15 +1,78 @@
+
 openapi: 3.0.0
 info:
   title: Servicio de consulta de transporte
   description: Servicio de gestión de Transporte Componente External Provider.
-  version: 1.0
+  version: 1.0.0
   license:
     name: "Apache 2.0"
     url: "http://www.apache.org/licences/LICENSE-2.0.html"
-    contact:
-      name: "Byron Martínez, Edgar Javier Rivera, Rafael Ocampo, Fabian Burgos, Harry Sánchez"
-      email: "jrafael.ocampo@javeriana.edu.co"
-  servers:
+  contact:
+    name: "Byron Martínez, Edgar Javier Rivera, Rafael Ocampo, Fabian Burgos, Harry Sánchez"
+    email: "jrafael.ocampo@javeriana.edu.co"
+servers:
     - url: 'https://localhost:8080/ExternalProvider'
 paths:
-  
+  /api/EPFlights:
+    post:
+      summary: Operación que permite poner una nueva consulta de transporte a los diferentes operadores que ofrecen el servicio.
+      description: Recibe los datos del cliente
+      requestBody:
+        description: Datos para el pago.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FlightRequest'
+      responses:
+        '200':
+          description: Operación exitosa, ver mensaje con el resultado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FlightResponse'
+        '400':
+          description: Bad request, hay algún error en los parámetros especificados
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Cliente no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+    schemas:
+      ErrorResponse:
+        type: object
+        properties:
+          code:
+            type: string
+          message:
+            type: string
+        required:
+          - code
+          - message
+
+      FlightRequest:
+        type: object
+        properties:
+          departingCity:
+            description: Ciudad desde donde sale el transporte.
+            type: string
+          arrivingCity:
+            description: Ciudad de destino del viaje.
+            type: string
+          date:
+            description: Fecha en la que se desea realizar el viaje.
+            type: string
+
+      FlightResponse:
+        type: object
+        properties:
+          topicId:
+            description: Identificador del topico de Kafka al cual debe subscribirse para recibir la respuesta.
+            type: string
