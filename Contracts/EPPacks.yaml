@@ -6,9 +6,73 @@ info:
   license:
     name: "Apache 2.0"
     url: "http://www.apache.org/licences/LICENSE-2.0.html"
-    contact:
+  contact:
       name: "Byron Martínez, Edgar Javier Rivera, Rafael Ocampo, Fabian Burgos, Harry Sánchez"
       email: "jrafael.ocampo@javeriana.edu.co"
-  servers:
+servers:
     - url: 'https://localhost:8080/Cliente'
 paths:
+  /api/EPPacks:
+    post:
+      summary: Operación que permite poner una nueva consulta de paquetes y productos
+      description: Recibe los datos necesarios para la consulta.
+      requestBody:
+        description: Datos para la consulta.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PacksRequest'
+      responses:
+        '200':
+          description: Operación exitosa, ver mensaje con el resultado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PacksResponse'
+        '400':
+          description: Bad request, hay algún error en los parámetros especificados
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Cliente no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      required:
+        - code
+        - message
+
+    PacksRequest:
+      type: object
+      properties:
+        departingCity:
+          description: Ciudad desde donde sale el transporte.
+          type: string
+        arrivingCity:
+          description: Ciudad de destino del viaje.
+          type: string
+        date:
+          description: Fecha en la que se desea realizar el viaje.
+          type: string
+
+    PacksResponse:
+      type: object
+      properties:
+        topicId:
+          description: Identificador del topico de Kafka al cual debe subscribirse para recibir la respuesta.
+          type: string
+

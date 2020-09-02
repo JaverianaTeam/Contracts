@@ -2,14 +2,80 @@ openapi: 3.0.0
 info:
   title: Servicio de consulta de Hospedaje
   description: Servicio de consulta de hospedaje - External providers
-  version: 1.0
+  version: 1.0.0
   license:
     name: "Apache 2.0"
     url: "http://www.apache.org/licences/LICENSE-2.0.html"
-    contact:
+  contact:
       name: "Byron Martínez, Edgar Javier Rivera, Rafael Ocampo, Fabian Burgos, Harry Sánchez"
       email: "jrafael.ocampo@javeriana.edu.co"
-  servers:
+servers:
     - url: 'https://localhost:8080/Cliente'
 paths:
-  
+  /api/EPStays:
+    post:
+      summary: Operación que permite poner una nueva consulta de servicios de hospedaje a los diferentes operadores que ofrecen el servicio.
+      description: Recibe los datos para la consulta de hospedaje
+      requestBody:
+        description: Datos para el pago.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StayRequest'
+      responses:
+        '200':
+          description: Operación exitosa, ver mensaje con el resultado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StayResponse'
+        '400':
+          description: Bad request, hay algún error en los parámetros especificados
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Cliente no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      required:
+        - code
+        - message
+
+    StayRequest:
+      type: object
+      properties:
+        country:
+          description: País del hospedaje.
+          type: string
+        city:
+          description: Ciudad del hospedaje.
+          type: string
+        dateCheckin:
+          description: Fecha de inicio del hospedaje.
+          type: date
+        dateCheckout:
+          description: Fecha de fin del hospedaje.
+          type: date
+
+    StayResponse:
+      type: object
+      properties:
+        topicId:
+          description: Identificador del topico de Kafka al cual debe subscribirse para recibir la respuesta.
+          type: string
+
