@@ -94,6 +94,9 @@ components:
     client:
       type: object
       properties:
+        customerId:
+          type: integer
+          example: 1012458870
         firstName:
           type: string
         lastName:

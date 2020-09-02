@@ -12,7 +12,9 @@ info:
 externalDocs:
   description: Find out more about Swagger
   url: http://swagger.io
-
+servers:
+- url: https://petstore.swagger.io/v2
+- url: http://petstore.swagger.io/v2
 tags:
 - name: Order Manager
   description: order manager
@@ -72,6 +74,32 @@ paths:
       security:
       - touresbalon_auth:
         - read:order
+  /order/manager/{custId}:
+    get:
+      tags:
+      - get orders
+      summary: Get a list of orders by custId
+      operationId: queryOrdersByCustId
+      parameters:
+      - name: custId
+        in: path
+        description: id of customer to return a list of orders
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdersList'
+        404:
+          description: Orders not found
+          content: {}
+      security:
+      - touresbalon_auth:
+        - read:order
   /order/manager/status:
     put:
       tags:
@@ -106,7 +134,7 @@ paths:
       summary: Update booking of the orders
       operationId: confirmBookingByOrder
       requestBody:
-        description: confirmation of booking 
+        description: Pet object that needs to be added to the store
         content:
           application/json:
             schema:
@@ -270,6 +298,13 @@ components:
         event:
           type: string
           example: "152369"
+    OrdersList:
+      type: object
+      properties:
+        orders:
+          type: array
+          items:
+            $ref: '#/components/schemas/FullOrder'
     FullOrder:
       type: object
       properties:
